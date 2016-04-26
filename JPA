@@ -1,0 +1,70 @@
+?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="ProjetoMysqlCustomerPU">
+	<description>Unidade de Persistência Mysql</description>
+     <provider>org.hibernate.ejb.HibernatePersistence</provider>
+     <!--<jta-data-source>java:jboss/datasources/customer</jta-data-source> -->
+     <class>br.com.model.Customer</class>
+     <properties>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/customersdatabase" />
+            <property name="javax.persistence.jdbc.user" value="alexen" />
+            <property name="javax.persistence.jdbc.password" value="teste123" />
+			<property name="hibernate.default_schema" value="customersdatabase"/>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+            <property name="hibernate.show_sql" value="true" />
+            <!--<property name="hibernate.hbm2ddl.auto" value="create" />-->
+        </properties>
+	</persistence-unit>
+</persistence>
+
+JPAUtil
+package br.com.helper;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+public class JpaUtil {
+
+	private static EntityManagerFactory factory;
+	static {
+		factory = Persistence.createEntityManagerFactory("ProjetoMysqlCustomerPU");
+	}
+	public static EntityManager getEntityManager() {
+		return factory.createEntityManager();
+	}
+	public static void close() {
+		factory.close();
+	}
+Exemplo de Criação de um cliente
+package br.com.resource;
+
+import javax.persistence.EntityManager;
+//import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+//import javax.persistence.Persistence;
+
+import br.com.helper.JpaUtil;
+import br.com.model.*;
+
+public class CreateCustomer {
+
+	public static void main( String[ ] args ) {
+
+		//EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("ProjetoMysqlCustomerPU");
+
+		EntityManager entitymanager = JpaUtil.getEntityManager();
+		EntityTransaction tx = entitymanager.getTransaction();
+		tx.begin( );
+
+		Customer customer = new Customer( ); 
+		customer.setCustomerID("1202");
+		customer.setName("Artur Campos");
+		customer.setNid("Technical Manager Architect");
+
+		entitymanager.persist(customer);
+		tx.commit( );
+
+		entitymanager.close( );
+		JpaUtil.close( );
